@@ -6,34 +6,34 @@
 
 using namespace std;
 
-void displayBoard(const string board[9]) {
-    cout << "=====================================" << endl;
-    cout << "           TicTacToe Games           " << endl;
-    cout << "=====================================" << endl;
+void displayBoard(string board[9], int round, int maxRound) {
+    cout << "======================================" << endl;
+    cout << "            TicTacToe Games           " << endl;
+    cout << "======================================" << endl;
     cout << "Dibuat oleh Mastay\nSocial Media :\nIG : https://instagram.com/nniceone._\nGithub : https://github.com/MastayY\n" << endl;
     cout << "KETERANGAN :\nPlayer : 'X'\nComputer : 'O'" << endl;
-    cout << "=====================================\n" << endl;
+    cout << "\n============== [ " << round << "/" << maxRound << " ] ==============\n" << endl;
 
-    cout << "\t     |     |     " << endl;
-    cout << "\t  " << board[0] << "  |  " << board[1] << "  |  " << board[2] << endl;
-    cout << "\t_____|_____|_____" << endl;
-    cout << "\t     |     |     " << endl;
-    cout << "\t  " << board[3] << "  |  " << board[4] << "  |  " << board[5] << endl;
-    cout << "\t_____|_____|_____" << endl;
-    cout << "\t     |     |     " << endl;
-    cout << "\t  " << board[6] << "  |  " << board[7] << "  |  " << board[8] << endl;
-    cout << "\t     |     |     " << endl << endl;
+    cout << "\t       |     |     " << endl;
+    cout << "\t    " << board[0] << "  |  " << board[1] << "  |  " << board[2] << endl;
+    cout << "\t  _____|_____|_____" << endl;
+    cout << "\t       |     |     " << endl;
+    cout << "\t    " << board[3] << "  |  " << board[4] << "  |  " << board[5] << endl;
+    cout << "\t  _____|_____|_____" << endl;
+    cout << "\t       |     |     " << endl;
+    cout << "\t    " << board[6] << "  |  " << board[7] << "  |  " << board[8] << endl;
+    cout << "\t       |     |     " << endl << endl;
 
-    cout << "\n=====================================" << endl;
+    cout << "======================================\n" << endl;
 }
 
 int evaluate(string board[9]) {
     for (int row = 0; row < 3; row++) {
         if (board[row * 3] == board[row * 3 + 1] && board[row * 3 + 1] == board[row * 3 + 2]) {
             if (board[row * 3] == "O") {
-                return 10;  // Computer wins
+                return 10;  
             } else if (board[row * 3] == "X") {
-                return -10;  // Player wins
+                return -10;  
             }
         }
     }
@@ -41,51 +41,64 @@ int evaluate(string board[9]) {
     for (int col = 0; col < 3; col++) {
         if (board[col] == board[col + 3] && board[col + 3] == board[col + 6]) {
             if (board[col] == "O") {
-                return 10;  // Computer wins
+                return 10;  
             } else if (board[col] == "X") {
-                return -10;  // Player wins
+                return -10;  
             }
         }
     }
 
     if (board[0] == board[4] && board[4] == board[8]) {
         if (board[0] == "O") {
-            return 10;  // Computer wins
+            return 10;  
         } else if (board[0] == "X") {
-            return -10;  // Player wins
+            return -10;  
         }
     }
 
     if (board[2] == board[4] && board[4] == board[6]) {
         if (board[2] == "O") {
-            return 10;  // Computer wins
+            return 10;  
         } else if (board[2] == "X") {
-            return -10;  // Player wins
+            return -10;  
         }
     }
 
     return 0;
 }
 
+bool isMovesLeft(string board[9]) 
+{ 
+    for (int i = 0; i < 9; i++) 
+        if (board[i] == " ") {
+            return true; 
+        } 
+    return false; 
+} 
+
 int minimax(string board[9], int depth, bool isMaximizing) {
     int score = evaluate(board);
     if (score == 10) {
-        return score - depth;
+        return score;
     }
     if (score == -10) {
-        return score + depth;
+        return score;
     }
-    if (depth == 9) {
+    if (depth == 0) { 
+        return 0;
+    }
+
+    if (isMovesLeft(board) == false) {
         return 0;
     }
 
     if (isMaximizing) {
-        int bestScore = numeric_limits<int>::min();
+        int bestScore = -1000;
 
         for (int i = 0; i < 9; i++) {
             if (board[i] == " ") {
                 board[i] = "O";
-                int currentScore = minimax(board, depth + 1, false);
+                int currentScore = minimax(board, depth + 1, !isMaximizing);
                 board[i] = " ";  
 
                 bestScore = max(bestScore, currentScore);
@@ -94,12 +107,12 @@ int minimax(string board[9], int depth, bool isMaximizing) {
 
         return bestScore;
     } else {
-        int bestScore = numeric_limits<int>::max();
+        int bestScore = 1000;
 
         for (int i = 0; i < 9; i++) {
             if (board[i] == " ") {
                 board[i] = "X";
-                int currentScore = minimax(board, depth + 1, true);
+                int currentScore = minimax(board, depth + 1, !isMaximizing);
                 board[i] = " ";  
 
                 bestScore = min(bestScore, currentScore);
@@ -110,15 +123,15 @@ int minimax(string board[9], int depth, bool isMaximizing) {
     }
 }
 
-int findBestMove(string board[9]) {
-    int bestVal = numeric_limits<int>::min();
+int findBestMove(string board[9], int depth) {
+    int bestVal = -1000;
     int bestMove = -1;
 
     for (int i = 0; i < 9; i++) {
         if (board[i] == " ") {
             board[i] = "O";
-            int moveVal = minimax(board, 5, false);
-            board[i] = " ";  // Undo the move
+            int moveVal = minimax(board, depth, false);
+            board[i] = " ";  // undo move
 
             if (moveVal > bestVal) {
                 bestMove = i;
@@ -130,52 +143,108 @@ int findBestMove(string board[9]) {
     return bestMove;
 }
 
+// Scoring sistem
+int getDynamicScore(string board[9], int movesMade, int emptySpaces) {
+    int winMultiplier = 8;
+    int drawMultiplier = 5;
+    int moveMultiplier = 2;
+
+    if (evaluate(board) == 10) {
+        return winMultiplier * (10 - (movesMade * 2));
+    } else if (evaluate(board) == 0) {
+        return drawMultiplier * (10 - (movesMade * 2));
+    } else {
+        return moveMultiplier * emptySpaces * 2;
+    }
+}
+
 int main() {
     string board[9] = {" ", " ", " ", " ", " ", " ", " ", " ",  " "};
     // int leaderboard[50];
     int turn = 1;
-    char again;
     int move = 0;
+    int score = 0;
+    int playerPoint = 0;
+    int computerPoint = 0;
+    int round = 1;
+    int MAX_ROUND = 2;
+    int difficulty;
+
+    cout << "\n\n1. Easy\n2. Impossible\nPilih Tingkat Kesulitan : ";
+    cin >> difficulty;
+
+    system("cls");
 
     while(true) {
         int choice;
 
-        system("cls");
-
         if(evaluate(board) == -10) {
-            displayBoard(board);
-            cout << "\nPlayer 1 Menang\n" << endl;
+            displayBoard(board, round, MAX_ROUND);
+            cout << "Player Menang\n" << endl;
 
-            cout << "Main lagi? ";
-            cin >> again;
-
-            if (again == 'y' || again == 'Y') {
+            if (round <= MAX_ROUND) {
                 for (int i = 0; i < 9; i++) {
                     board[i] = " ";
                 }
                 move = 0;
                 turn = 1;
-                
-            } else {
-                break;
+                playerPoint += 1;
+                round += 1;
             }
+
+            score += 15;
+
+            Sleep(1500);
+            system("cls");
             
         } else if(evaluate(board) == 10) {
-            displayBoard(board);
-            cout << "\nComputer Menang\n" << endl;
+            displayBoard(board, round, MAX_ROUND);
+            cout << "Computer Menang\n" << endl;
             
-            break;
-        } else if(evaluate(board) == 0 && move > 7) {
-            displayBoard(board);
-            cout << "\nDRAW!!\n" << endl;
+            if (round <= MAX_ROUND) {
+                for (int i = 0; i < 9; i++) {
+                    board[i] = " ";
+                }
+                move = 0;
+                turn = 1;
+                computerPoint += 1;
+                round += 1;
+            }
+
+            score += 5;
+
+            Sleep(1500);
+            system("cls");
+
+        } else if(evaluate(board) == 0 && !isMovesLeft(board)) {
+            displayBoard(board, round, MAX_ROUND);
+            cout << "Seimbang\n" << endl;
             
+            if (round <= MAX_ROUND) {
+                for (int i = 0; i < 9; i++) {
+                    board[i] = " ";
+                }
+                move = 0;
+                turn = 1;
+                round += 1;
+            }
+
+            score += 1;
+
+            Sleep(1500);
+            system("cls");
+        }
+
+        if(round > MAX_ROUND) {
+            system("cls");
             break;
         }
 
-        displayBoard(board);
+        cout << "\n\nSCORE : " << score << endl << endl;
+        displayBoard(board, round, MAX_ROUND);
 
         if(turn == 1) {
-            cout << "Player " << turn << " masukkan nomor index papan : ";
+            cout << "Masukkan nomor index papan : ";
             cin >> choice;
             switch(choice) {
                 case 1:
@@ -191,6 +260,13 @@ int main() {
                         board[choice - 1] = "X";
                         turn = 2;
                         move += 1;
+                        if (evaluate(board) == 10) {
+                            score += getDynamicScore(board, move, 9 - move);
+                        } else if (evaluate(board) == 0) {
+                            score += getDynamicScore(board, move, 9 - move);
+                        } else {
+                            score += getDynamicScore(board, move, 9 - move);
+                        }
                     } else {
                         cout << "\n[ERROR] Pilihan sudah diisi\n" << endl;
                     }
@@ -202,25 +278,28 @@ int main() {
                     break;
             }
         } else {
-            if (move <= 1) {
-                srand((unsigned) time(NULL));
-                int index = rand() % 9;
-
-                while (board[index] != " ") {
-                    index = rand() % 9;
-                }
-
-                turn = 1;
-
-                board[index] = "O";
-            } else {
-                int bestMove = findBestMove(board);
+            if(difficulty == 1) {
+                int bestMove = findBestMove(board, 0);
                 board[bestMove] = "O";
-                turn = 1;
-                cout << "Komputer sedang berpikir......";
-                Sleep(3000);
+            } else {
+                int bestMove = findBestMove(board, 7);
+                board[bestMove] = "O";
             }
+
+            turn = 1;
+            cout << "Komputer sedang berpikir......\n";
         }
 
+        Sleep(1200);
+        system("cls");
+
     }
+
+    cout << "\n========== [ HASIL ] ==========" << endl;
+    cout << "\nSCORE\t\t: " << score << endl;
+    cout << "\n-------------------------------";
+    cout << "\n       Ronde dimenangkan       ";
+    cout << "\n-------------------------------" << endl;
+    cout << "\nPlayer\t\t: " << playerPoint << "\nComputer\t: " << computerPoint << endl;
+    cout << "\n===============================";
 }
